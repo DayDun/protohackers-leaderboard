@@ -4,8 +4,8 @@
 // @version     1.0
 // @author      DayDun
 // @namespace   https://github.com/DayDun/protohackers-leaderboard/
-// @updateURL   https://raw.githubusercontent.com/DayDun/protohackers-leaderboard/master/protohackers-enhanced-leaderboard.js
-// @downloadURL https://raw.githubusercontent.com/DayDun/protohackers-leaderboard/master/protohackers-enhanced-leaderboard.js
+// @updateURL   https://github.com/DayDun/protohackers-leaderboard/raw/master/protohackers-enhanced-leaderboard.user.js
+// @downloadURL https://github.com/DayDun/protohackers-leaderboard/raw/master/protohackers-enhanced-leaderboard.user.js
 // @match       https://protohackers.com/*
 // @grant       none
 // @run-at      document-start
