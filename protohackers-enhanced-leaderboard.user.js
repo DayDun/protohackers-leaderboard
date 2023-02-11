@@ -150,7 +150,7 @@ async function init() {
           for (let problem of problems) {
               if (problem.id === 0) continue;
               let penalty = Object.values(users).length;
-              if (rankingSelect.value == "whatif") {
+              if (rankingSelect.value === "whatif") {
                   penalty = problem.leaderboard.length + 1;
               }
               let placement = placements[problem.id].find(a => a.user.id === user.id);
@@ -172,7 +172,7 @@ async function init() {
       }
 
       let leaderboard = Object.values(users);
-      if (rankingSelect.value === "standard" || rankingSelect.value == "whatif") {
+      if (rankingSelect.value === "standard" || rankingSelect.value === "whatif") {
         leaderboard.sort((a, b) => {
           if (a.rankSum - b.rankSum !== 0) return a.rankSum - b.rankSum;
           return a.recentSolve - b.recentSolve;
@@ -295,7 +295,7 @@ async function init() {
           for (let problem of problems) {
           let placement = problem.leaderboard.find(a => a.user.id === user.id);
               if (!placement) {
-                  if (rankingSelect.value != "whatif") {
+                  if (rankingSelect.value !== "whatif") {
                       addTd(document.createTextNode("-"), "score nil");
                   } else {
                       addTd(document.createTextNode("~" + (problem.leaderboard.length + 1)), "score nil nil-whatif");
