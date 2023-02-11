@@ -95,7 +95,8 @@ async function init() {
       ["24h", "Top Within 24 Hours", false],
       ["top50", "Top 50 / Day", false],
       ["log", "Logarithmic Ranking", false],
-      ["medals", "Most Medals", false]
+      ["medals", "Most Medals", false],
+      ["whatif", "What if they solved the rest?", false],
     ]) {
       let option = document.createElement("option");
       option.value = id;
@@ -148,6 +149,10 @@ async function init() {
         let logSum = 0;
           for (let problem of problems) {
               if (problem.id === 0) continue;
+              let penalty = Object.values(users).length;
+              if (rankingSelect.value == "whatif") {
+                  penalty = problem.leaderboard.length + 1;
+              }
               let placement = placements[problem.id].find(a => a.user.id === user.id);
           let rank;
           if (placement) {
@@ -156,7 +161,7 @@ async function init() {
             else rank = placement.rank;
           } else {
             if (isPlacementsFiltered) rank = 0;
-            else rank = Object.values(users).length;
+            else rank = penalty;
           }
           //let rank = placement ? placement.rank : Object.values(users).length;
           sum += rank;
@@ -167,7 +172,7 @@ async function init() {
       }
 
       let leaderboard = Object.values(users);
-      if (rankingSelect.value === "standard") {
+      if (rankingSelect.value === "standard" || rankingSelect.value == "whatif") {
         leaderboard.sort((a, b) => {
           if (a.rankSum - b.rankSum !== 0) return a.rankSum - b.rankSum;
           return a.recentSolve - b.recentSolve;
@@ -289,9 +294,13 @@ async function init() {
 
           for (let problem of problems) {
           let placement = problem.leaderboard.find(a => a.user.id === user.id);
-              if (!placement)
-                  addTd(document.createTextNode("-"), "score nil");
-              else {
+              if (!placement) {
+                  if (rankingSelect.value != "whatif") {
+                      addTd(document.createTextNode("-"), "score nil");
+                  } else {
+                      addTd(document.createTextNode("~" + (problem.leaderboard.length + 1)), "score nil nil-whatif");
+                  }
+              } else {
                   let rankText = placement.rank;
                   if (rankText === 1) rankText = "🥇";
                   if (rankText === 2) rankText = "🥈";
@@ -361,6 +370,9 @@ async function init() {
     table td.time,
     table td.score {
         text-align: right;
+    }
+    .nil-whatif {
+        color: #999;
     }
     `;
     document.head.appendChild(style);
