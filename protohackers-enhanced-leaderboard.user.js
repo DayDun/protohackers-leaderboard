@@ -6,7 +6,7 @@
 // @namespace   https://github.com/DayDun/protohackers-leaderboard/
 // @updateURL   https://github.com/DayDun/protohackers-leaderboard/raw/master/protohackers-enhanced-leaderboard.user.js
 // @downloadURL https://github.com/DayDun/protohackers-leaderboard/raw/master/protohackers-enhanced-leaderboard.user.js
-// @match       https://protohackers.com/*
+// @match       https://protohackers.com/leaderboard
 // @grant       none
 // @run-at      document-start
 // ==/UserScript==
@@ -108,13 +108,25 @@ async function init() {
 		renderLeaderboard();
 	});
 	
+	let whatifLabel = document.createElement("label");
+	let whatifCheckbox = document.createElement("input");
+	whatifCheckbox.type = "checkbox";
+	whatifCheckbox.addEventListener("change", () => {
+		renderLeaderboard();
+	});
+	whatifLabel.appendChild(whatifCheckbox);
+	whatifLabel.appendChild(document.createTextNode("If everyone solved every problem"));
+	
 	let table = document.querySelector("table");
 	table.parentNode.insertBefore(rankingSelect, table);
+	table.parentNode.insertBefore(whatifLabel, table);
 	
 	function renderLeaderboard() {
 		let elem = document.querySelector("table > tbody");
 		while (elem.firstChild)
 			elem.removeChild(elem.firstChild);
+		
+		let whatif = whatifCheckbox.checked;
 		
 		let removed = [];
 		let placements = {};
@@ -155,8 +167,9 @@ async function init() {
 					else if (removed.includes(placement)) rank = 0;
 					else rank = placement.rank;
 				} else {
+					// FIXME: If the filter duration has not yet passed, whatif scoring should technically be used here
 					if (isPlacementsFiltered) rank = 0;
-					else rank = Object.values(users).length;
+					else rank = whatif ? problem.leaderboard.length + 1 : Object.values(users).length;
 				}
 				//let rank = placement ? placement.rank : Object.values(users).length;
 				sum += rank;
@@ -289,9 +302,12 @@ async function init() {
 			
 			for (let problem of problems) {
 				let placement = problem.leaderboard.find(a => a.user.id === user.id);
-				if (!placement)
-					addTd(document.createTextNode("-"), "score nil");
-				else {
+				if (!placement) {
+					if (whatif)
+						addTd(document.createTextNode("~" + (problem.leaderboard.length + 1)), "score nil whatif");
+					else
+						addTd(document.createTextNode("-"), "score nil");
+				} else {
 					let rankText = placement.rank;
 					if (rankText === 1) rankText = "🥇";
 					if (rankText === 2) rankText = "🥈";
@@ -311,7 +327,7 @@ async function init() {
 	let style = document.createElement("style");
 	style.textContent = `
 	.container {
-		max-width: 1100px;
+		max-width: 1250px;
 	}
 	
 	table.leaderboard_leaderboard__89MED td,
@@ -361,6 +377,9 @@ async function init() {
 	table td.time,
 	table td.score {
 		text-align: right;
+	}
+	table td.score.whatif {
+		color: #999;
 	}
 	`;
 	document.head.appendChild(style);
